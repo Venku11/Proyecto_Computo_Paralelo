@@ -4,8 +4,8 @@ import numpy as np
 #Calculo de las metricas Accuracy, Precision, Recall y F1-Score
 def calcular_metricas(pred, gt):
 
-    pred = pred>0
-    gt = gt>0
+    pred = pred > 0
+    gt = gt > 0
 
     TP= np.logical_and(pred, gt).sum()
     TN= np.logical_and(~pred, ~gt).sum()
@@ -16,6 +16,7 @@ def calcular_metricas(pred, gt):
     precision= TP/(TP+FP+1e-8)
     recall = TP / (TP+FN+1e-8)
     f1 = 2*(precision*recall) /(precision+recall+1e-8)
+    iou = TP / (TP + FP + FN + 1e-8)
 
     #Devolucion de valores
-    return accuracy, precision, recall, f1
+    return accuracy, precision, recall, f1, iou
