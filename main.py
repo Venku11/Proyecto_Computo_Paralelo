@@ -7,12 +7,20 @@ import matplotlib.pyplot as plt
 from paralelizar import worker, nivelacion_cargas
 from loader import cargar_imagenes
 from configuracion import RUTA_DATASET, PROCESOS_LISTA, TIPO
+from configuracion import USAR_RANDOM_FOREST, ENTRENAR_MODELO, MODELO_RF, MAX_IMAGENES_ENTRENAMIENTO
 from visualizacion import graficar_rendimiento, graficar_metricas, mostrar_ejemplos
 
 
 if __name__ == "__main__":
 
     lista_imagenes = cargar_imagenes(RUTA_DATASET, TIPO)
+
+    print("Imágenes encontradas:", len(lista_imagenes))
+
+    if len(lista_imagenes) == 0:
+        print("No se encontraron imágenes.")
+        print("Revisa RUTA_DATASET y TIPO en configuracion.py")
+        exit()
 
     tiempos = []
     speedups = []
