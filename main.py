@@ -22,9 +22,23 @@ if __name__ == "__main__":
         print("Revisa RUTA_DATASET y TIPO en configuracion.py")
         exit()
 
+
+    # ---------------- ENTRENAMIENTO DEL MODELO ----------------
+
+    if USAR_RANDOM_FOREST and ENTRENAR_MODELO:
+        print("\nEntrenando modelo Random Forest...")
+        entrenar_random_forest(
+            lista_imagenes,
+            modelo_salida=MODELO_RF,
+            max_imagenes=MAX_IMAGENES_ENTRENAMIENTO
+        )
+
     tiempos = []
     speedups = []
     eficiencias = []
+    amdahl_lista = []
+    gustafson_lista = []
+    karp_flatt_lista = []
     metricas_globales = []
 
     for n_procesos in PROCESOS_LISTA:
@@ -37,7 +51,7 @@ if __name__ == "__main__":
         for i in range(len(cargas)):
             p = mp.Process(
                 target=worker,
-                args=(cargas[i], i, queue)
+                args=(cargas[i], i, queue, USAR_RANDOM_FOREST, MODELO_RF)
             )
             procesos.append(p)
             p.start()
