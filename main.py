@@ -73,20 +73,37 @@ if __name__ == "__main__":
     # ---------------- SPEEDUP Y EFICIENCIA ----------------
 
     for i in range(len(PROCESOS_LISTA)):
+        p = PROCESOS_LISTA[i]
         S = tiempos[0] / tiempos[i]
         E = S / PROCESOS_LISTA[i]
         speedups.append(S)
         eficiencias.append(E)
+
+        if p == 1:
+            K = 0
+            A = 1
+            G = 1
+        else:
+            K = ((1 / S) - (1 / p)) / (1 - (1 / p))
+            A = 1 / (K + ((1 - K) / p))
+            G = p - K * (p - 1)
+
+        karp_flatt_lista.append(K)
+        amdahl_lista.append(A)
+        gustafson_lista.append(G)
 
     print("\nResultados de Rendimiento:")
 
     for i in range(len(PROCESOS_LISTA)):
 
         print(f"""
-        Procesos:   {PROCESOS_LISTA[i]}
-        Tiempo:     {tiempos[i]:.2f} s
-        Speedup:    {speedups[i]:.2f}
-        Eficiencia: {eficiencias[i]:.2f}
+        Procesos:        {PROCESOS_LISTA[i]}
+        Tiempo:          {tiempos[i]:.2f} s
+        Speedup:         {speedups[i]:.2f}
+        Eficiencia:      {eficiencias[i]:.2f}
+        Amdahl:          {amdahl_lista[i]:.2f}
+        Gustafson:       {gustafson_lista[i]:.2f}
+        Karp-Flatt:      {karp_flatt_lista[i]:.4f}
         """)
 
     # Promedio de las metricas
