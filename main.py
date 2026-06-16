@@ -113,12 +113,14 @@ if __name__ == "__main__":
     prec = metricas_array[:, 1].mean()
     rec = metricas_array[:, 2].mean()
     f1 = metricas_array[:, 3].mean()
+    iou = metricas_array[:, 4].mean()
 
     print("\nMétricas finales:")
     print(f"Accuracy: {acc:.3f}")
     print(f"Precision: {prec:.3f}")
     print(f"Recall: {rec:.3f}")
     print(f"F1: {f1:.3f}")
+    print(f"IoU:       {iou:.3f}")
 
     # VISUALIZACIÓN
     graficar_rendimiento(PROCESOS_LISTA, tiempos, speedups, eficiencias)
