@@ -8,7 +8,7 @@ def calcular_metricas_paralelas(procesos, tiempos):
         p = procesos[i]
         tiempo_p = tiempos[i]
 
-        speedup = tiempo_base / tiempo_p
+        speedup = tiempo_base / (tiempo_p + 1e-8)
         eficiencia = speedup / p
 
         if p == 1:
