@@ -6,6 +6,8 @@ import matplotlib.pyplot as plt
 
 from paralelizar import worker, nivelacion_cargas
 from loader import cargar_imagenes
+from modelo_rf import entrenar_random_forest
+from metricas_paralelas import calcular_metricas_paralelas
 from configuracion import RUTA_DATASET, PROCESOS_LISTA, TIPO
 from configuracion import USAR_RANDOM_FOREST, ENTRENAR_MODELO, MODELO_RF, MAX_IMAGENES_ENTRENAMIENTO, MAX_MUESTRAS_POR_CLASE
 from visualizacion import graficar_rendimiento, graficar_metricas, mostrar_ejemplos
