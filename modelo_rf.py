@@ -1,7 +1,7 @@
 import numpy as np
 import cv2
 import rasterio
-import joblib
+import pickle
 
 from sklearn.ensemble import RandomForestClassifier
 from ground_truth import cargar_ground_truth
@@ -140,22 +140,36 @@ def entrenar_random_forest(
 
 
 
-def predecir_random_forest(tif_path, modelo_path="modelo_rf.joblib"):
 
-    modelo = joblib.load(modelo_path)
+def cargar_modelo(modelo_path):
+
+    with open(modelo_path, "rb") as f:
+
+        modelo = pickle.load(f)
+
+    return modelo
+
+
+def predecir_random_forest(tif_path, modelo_path="modelo_rf.pkl"):
+
+    modelo = cargar_modelo(modelo_path)
 
     features = extraer_features(tif_path)
+
     h, w, c = features.shape
 
     X = features.reshape(-1, c)
 
     pred = modelo.predict(X)
+
     mask = pred.reshape(h, w).astype(np.uint8) * 255
 
     kernel = np.ones((3, 3), np.uint8)
 
     mask = cv2.medianBlur(mask, 5)
+
     mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel, 2)
+
     mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel, 1)
 
     return mask
