@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 from paralelizar import worker, nivelacion_cargas
 from loader import cargar_imagenes
 from configuracion import RUTA_DATASET, PROCESOS_LISTA, TIPO
-from configuracion import USAR_RANDOM_FOREST, ENTRENAR_MODELO, MODELO_RF, MAX_IMAGENES_ENTRENAMIENTO
+from configuracion import USAR_RANDOM_FOREST, ENTRENAR_MODELO, MODELO_RF, MAX_IMAGENES_ENTRENAMIENTO, MAX_MUESTRAS_POR_CLASE
 from visualizacion import graficar_rendimiento, graficar_metricas, mostrar_ejemplos
 
 
@@ -34,16 +34,11 @@ if __name__ == "__main__":
         )
 
     tiempos = []
-    speedups = []
-    eficiencias = []
-    amdahl_lista = []
-    gustafson_lista = []
-    karp_flatt_lista = []
     metricas_globales = []
 
     for n_procesos in PROCESOS_LISTA:
         print(f"\nEjecutando con {n_procesos} procesos:")
-        inicio = time.time()
+        inicio = time.perf_counter()
         cargas = nivelacion_cargas(lista_imagenes, n_procesos)
         queue = mp.Queue()
         procesos = []
@@ -64,7 +59,7 @@ if __name__ == "__main__":
         for p in procesos:
             p.join()
         
-        fin = time.time()
+        fin = time.perf_counter()
         tiempo = fin - inicio
         tiempos.append(tiempo)
         print(f"Tiempo con {n_procesos} procesos: {tiempo:.2f} segundos")
