@@ -6,11 +6,13 @@ from ground_truth import cargar_ground_truth
 import time
 
 
-def worker(lista_imagenes, id_proceso, queue, usar_rf=False, modelo_rf="modelo_rf.joblib"):
+def worker(lista_imagenes, id_proceso, queue, usar_rf=False, modelo_rf="modelo_rf.pkl"):
 
     inicio = time.time()
 
     resultados = []
+
+    total_imagenes = len(lista_imagenes)
 
     try:
 
