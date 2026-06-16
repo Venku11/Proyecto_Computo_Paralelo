@@ -17,4 +17,4 @@ def cargar_imagenes(ruta_base, tipo="pre"):
         patron = "*.tif"
 
     # Refresa una lista con las rutas completas de todas las imagenes encontradas
-    return glob.glob(f"{ruta_base}/{patron}")
+    return sorted(glob.glob(f"{ruta_base}/{patron}"))
