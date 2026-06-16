@@ -124,6 +124,6 @@ if __name__ == "__main__":
 
     # VISUALIZACIÓN
     graficar_rendimiento(PROCESOS_LISTA, tiempos, speedups, eficiencias)
-    graficar_metricas(acc, prec, rec, f1)
+    graficar_metricas(acc, prec, rec, f1, iou)
     mostrar_ejemplos(lista_imagenes, cantidad=5)
     
