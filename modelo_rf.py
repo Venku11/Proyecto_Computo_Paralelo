@@ -18,3 +18,30 @@ def leer_rgb(tif_path):
 
     return rgb_uint8
 
+def extraer_features(tif_path):
+
+    rgb = leer_rgb(tif_path)
+
+    hsv = cv2.cvtColor(rgb, cv2.COLOR_RGB2HSV)
+    gray = cv2.cvtColor(rgb, cv2.COLOR_RGB2GRAY)
+
+    blur = cv2.GaussianBlur(gray, (5, 5), 0)
+    edges = cv2.Canny(blur, 80, 180)
+
+    h, w = gray.shape
+
+    x_coords = np.tile(np.arange(w), (h, 1)) / w
+    y_coords = np.tile(np.arange(h).reshape(-1, 1), (1, w)) / h
+
+    features = np.dstack([
+        rgb[:, :, 0],
+        rgb[:, :, 1],
+        rgb[:, :, 2],
+        hsv[:, :, 0],
+        hsv[:, :, 1],
+        hsv[:, :, 2],
+        gray,
+        edges,
+        x_coords * 255,
+        y_coords * 255
+    ])
