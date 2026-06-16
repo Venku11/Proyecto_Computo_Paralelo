@@ -1,42 +1,40 @@
 from procesamiento_imagenes import procesarImagen
+from modelo_rf import predecir_random_forest
 from metricas import calcular_metricas
 from ground_truth import cargar_ground_truth
-import numpy as np
+
 import time
-def worker(lista_imagenes, id_proceso, queue):
+
+
+def worker(lista_imagenes, id_proceso, queue, usar_rf=False, modelo_rf="modelo_rf.joblib"):
 
     inicio = time.time()
 
     resultados = []
 
-    total_imagenes = len(lista_imagenes)
-
     try:
 
         for ruta in lista_imagenes:
 
-            #gemerar mascara
-            mask_pred = procesarImagen(ruta)
+            if usar_rf:
+                mask_pred = predecir_random_forest(ruta, modelo_rf)
+            else:
+                mask_pred = procesarImagen(ruta)
 
-            # Ajustamos ruta del JSON GT
             ruta_gt = ruta.replace("images", "labels").replace(".tif", ".json")
 
             try:
-
-                # Cargar máscara real desde JSON
                 gt = cargar_ground_truth(ruta_gt, mask_pred.shape)
 
-                # Calcular métricas
-                acc, prec, rec, f1 = calcular_metricas(mask_pred, gt)
+                acc, prec, rec, f1, iou = calcular_metricas(mask_pred, gt)
 
             except Exception as e:
 
                 print(f"Error en {ruta_gt}: {e}")
 
-                acc = prec = rec = f1 = 0
+                acc = prec = rec = f1 = iou = 0
 
-            # guarda las metricas en la lista local del proceso
-            resultados.append((acc, prec, rec, f1))
+            resultados.append((acc, prec, rec, f1, iou))
 
     except Exception as e:
 
@@ -44,10 +42,10 @@ def worker(lista_imagenes, id_proceso, queue):
 
     finally:
 
-        # envia SIEMPRE los datos
         queue.put(resultados)
 
         print(f"Proceso {id_proceso} terminado")
+
 
 
 
