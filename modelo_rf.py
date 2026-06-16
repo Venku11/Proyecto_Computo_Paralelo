@@ -45,3 +45,35 @@ def extraer_features(tif_path):
         x_coords * 255,
         y_coords * 255
     ])
+
+
+    return features.astype(np.float32)
+
+
+def crear_muestras_entrenamiento(tif_path, max_por_clase=3000):
+
+    features = extraer_features(tif_path)
+
+    ruta_gt = tif_path.replace("images", "labels").replace(".tif", ".json")
+    gt = cargar_ground_truth(ruta_gt, features.shape[:2])
+
+    X = features.reshape(-1, features.shape[2])
+    y = (gt.reshape(-1) > 0).astype(np.uint8)
+
+    indices_estructura = np.where(y == 1)[0]
+    indices_fondo = np.where(y == 0)[0]
+
+    if len(indices_estructura) == 0:
+        return None, None
+
+    n_estructura = min(max_por_clase, len(indices_estructura))
+    n_fondo = min(max_por_clase, len(indices_fondo))
+
+    indices_estructura = np.random.choice(indices_estructura, n_estructura, replace=False)
+    indices_fondo = np.random.choice(indices_fondo, n_fondo, replace=False)
+
+    indices = np.concatenate([indices_estructura, indices_fondo])
+    np.random.shuffle(indices)
+
+    return X[indices], y[indices]
+
