@@ -22,9 +22,23 @@ if __name__ == "__main__":
         print("Revisa RUTA_DATASET y TIPO en configuracion.py")
         exit()
 
+
+    # ---------------- ENTRENAMIENTO DEL MODELO ----------------
+
+    if USAR_RANDOM_FOREST and ENTRENAR_MODELO:
+        print("\nEntrenando modelo Random Forest...")
+        entrenar_random_forest(
+            lista_imagenes,
+            modelo_salida=MODELO_RF,
+            max_imagenes=MAX_IMAGENES_ENTRENAMIENTO
+        )
+
     tiempos = []
     speedups = []
     eficiencias = []
+    amdahl_lista = []
+    gustafson_lista = []
+    karp_flatt_lista = []
     metricas_globales = []
 
     for n_procesos in PROCESOS_LISTA:
@@ -37,7 +51,7 @@ if __name__ == "__main__":
         for i in range(len(cargas)):
             p = mp.Process(
                 target=worker,
-                args=(cargas[i], i, queue)
+                args=(cargas[i], i, queue, USAR_RANDOM_FOREST, MODELO_RF)
             )
             procesos.append(p)
             p.start()
@@ -59,20 +73,37 @@ if __name__ == "__main__":
     # ---------------- SPEEDUP Y EFICIENCIA ----------------
 
     for i in range(len(PROCESOS_LISTA)):
+        p = PROCESOS_LISTA[i]
         S = tiempos[0] / tiempos[i]
         E = S / PROCESOS_LISTA[i]
         speedups.append(S)
         eficiencias.append(E)
+
+        if p == 1:
+            K = 0
+            A = 1
+            G = 1
+        else:
+            K = ((1 / S) - (1 / p)) / (1 - (1 / p))
+            A = 1 / (K + ((1 - K) / p))
+            G = p - K * (p - 1)
+
+        karp_flatt_lista.append(K)
+        amdahl_lista.append(A)
+        gustafson_lista.append(G)
 
     print("\nResultados de Rendimiento:")
 
     for i in range(len(PROCESOS_LISTA)):
 
         print(f"""
-        Procesos:   {PROCESOS_LISTA[i]}
-        Tiempo:     {tiempos[i]:.2f} s
-        Speedup:    {speedups[i]:.2f}
-        Eficiencia: {eficiencias[i]:.2f}
+        Procesos:        {PROCESOS_LISTA[i]}
+        Tiempo:          {tiempos[i]:.2f} s
+        Speedup:         {speedups[i]:.2f}
+        Eficiencia:      {eficiencias[i]:.2f}
+        Amdahl:          {amdahl_lista[i]:.2f}
+        Gustafson:       {gustafson_lista[i]:.2f}
+        Karp-Flatt:      {karp_flatt_lista[i]:.4f}
         """)
 
     # Promedio de las metricas
@@ -82,15 +113,17 @@ if __name__ == "__main__":
     prec = metricas_array[:, 1].mean()
     rec = metricas_array[:, 2].mean()
     f1 = metricas_array[:, 3].mean()
+    iou = metricas_array[:, 4].mean()
 
     print("\nMétricas finales:")
     print(f"Accuracy: {acc:.3f}")
     print(f"Precision: {prec:.3f}")
     print(f"Recall: {rec:.3f}")
     print(f"F1: {f1:.3f}")
+    print(f"IoU:       {iou:.3f}")
 
     # VISUALIZACIÓN
     graficar_rendimiento(PROCESOS_LISTA, tiempos, speedups, eficiencias)
-    graficar_metricas(acc, prec, rec, f1)
+    graficar_metricas(acc, prec, rec, f1, iou)
     mostrar_ejemplos(lista_imagenes, cantidad=5)
     
