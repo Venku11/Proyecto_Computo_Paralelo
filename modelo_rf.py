@@ -77,3 +77,40 @@ def crear_muestras_entrenamiento(tif_path, max_por_clase=3000):
 
     return X[indices], y[indices]
 
+def entrenar_random_forest(lista_imagenes, modelo_salida="modelo_rf.joblib", max_imagenes=20):
+
+    X_total = []
+    y_total = []
+
+    imagenes_entrenamiento = lista_imagenes[:max_imagenes]
+
+    for ruta in imagenes_entrenamiento:
+
+        try:
+            X, y = crear_muestras_entrenamiento(ruta)
+
+            if X is not None:
+                X_total.append(X)
+                y_total.append(y)
+                print("Imagen agregada al entrenamiento:", ruta)
+
+        except Exception as e:
+            print("Error entrenando con", ruta, ":", e)
+
+    X_total = np.vstack(X_total)
+    y_total = np.concatenate(y_total)
+
+    modelo = RandomForestClassifier(
+        n_estimators=100,
+        max_depth=20,
+        class_weight="balanced",
+        n_jobs=-1,
+        random_state=42
+    )
+
+    modelo.fit(X_total, y_total)
+
+    joblib.dump(modelo, modelo_salida)
+
+    print("Modelo Random Forest guardado en:", modelo_salida)
+
